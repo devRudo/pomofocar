@@ -27,14 +27,24 @@ import Modal from "react-native-modal";
 import { v4 as uuidv4 } from "uuid";
 import sounds from "../../utils/sounds";
 import { Audio } from "expo-av";
+import { useNavigation } from "@react-navigation/native";
 
 const Home = () => {
   const circularProgressRef = useRef();
-  const [values, setValues] = useState({});
+  const [values, setValues] = useState({
+    autostart: true,
+    darkmode: true,
+    longbreakduration: 15,
+    notificationSound: "Bells",
+    notifications: true,
+    shortbreakduration: 5,
+    taskduration: 25,
+    timerInTitle: true,
+  });
   const [timerRunning, setTimerRunning] = useState(false);
   const [activeTaskIndex, setActiveTaskIndex] = useState(0);
-  const totalTasks = 4;
   const [tasks, setTasks] = useState([]);
+  const navigation = useNavigation();
 
   const timerRef = useRef(null);
 
@@ -48,6 +58,12 @@ const Home = () => {
 
   const [currentFill, setCurrentFill] = useState(0);
   const [prefill, setPrefill] = useState(0);
+
+  const [sessionType, setSessionType] = useState("task");
+  const [showEditTaskModal, setShowEditTaskModal] = useState(null);
+  const [taskTitle, setTaskTitle] = useState("");
+
+  const [showAllTasksOptions, setShowAllTasksOptions] = useState(false);
 
   const handlePlaySound = async (soundName) => {
     const { sound } = await Audio.Sound.createAsync(
@@ -136,7 +152,7 @@ const Home = () => {
         if (allKeys.filter((key) => key === "tasks")?.[0]) {
           setTasks(JSON.parse(await AsyncStorage.getItem("tasks")));
         } else {
-          await AsyncStorage.setItem("tasks", []);
+          await AsyncStorage.setItem("tasks", JSON.stringify([]));
         }
       }
     } catch (e) {
@@ -185,6 +201,58 @@ const Home = () => {
     }
   };
 
+  const handleUpdateTask = async () => {
+    if (taskTitle && taskTitle.trim() && taskTitle.length > 3) {
+      try {
+        const tasks = JSON.parse(await AsyncStorage.getItem("tasks"));
+        const updatedTasks = tasks?.map((task) => {
+          if (task?.id === showEditTaskModal) {
+            return {
+              ...task,
+              title: taskTitle,
+            };
+          } else {
+            return task;
+          }
+        });
+        await AsyncStorage.setItem("tasks", JSON.stringify(updatedTasks));
+        getAsyncStoreData();
+        setShowEditTaskModal(null);
+        setTaskTitle("");
+        console.log("tasks", tasks);
+      } catch (e) {
+        console.log(e);
+      }
+    } else {
+      console.log("atleast 3 characters required");
+    }
+  };
+
+  // const handleClearFinishedTasks = async () => {
+  //   try {
+  //     const tasks = JSON.parse(await AsyncStorage.getItem("tasks"));
+  //     const updatedTasks = tasks?.filter((task) => task?.done);
+  //     await AsyncStorage.setItem("tasks", JSON.stringify(updatedTasks));
+  //     getAsyncStoreData();
+  //     setShowEditTaskModal(null);
+  //     setTaskTitle("");
+  //     console.log("tasks", tasks);
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // }
+
+  const handleClearAllTasks = async () => {
+    try {
+      const tasks = JSON.parse(await AsyncStorage.getItem("tasks"));
+      await AsyncStorage.setItem("tasks", JSON.stringify([]));
+      getAsyncStoreData();
+      setShowAllTasksOptions(false);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   useEffect(() => {}, [tasks]);
 
   useEffect(() => {
@@ -192,6 +260,14 @@ const Home = () => {
       // circularProgressRef.current.animate(100, 60000, Easing.linear);
     }
   }, [circularProgressRef]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      getAsyncStoreData();
+      getAsyncStoreSettingsData();
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   useEffect(() => {
     getAsyncStoreData();
@@ -212,23 +288,24 @@ const Home = () => {
   }, [timerSs]);
 
   useEffect(() => {
-    if (activeTaskIndex % 2 !== 0 && activeTaskIndex !== tasks.length * 2 - 1) {
+    if (sessionType === "shortbreak") {
       setAnimationDuration(values?.shortbreakduration * 60000);
-    } else if (
-      activeTaskIndex % 2 !== 0 &&
-      activeTaskIndex === tasks.length * 2 - 1
-    ) {
+    } else if (sessionType === "longbreak") {
       setAnimationDuration(values?.longbreakduration * 60000);
     } else {
       setAnimationDuration(values?.taskduration * 60000);
     }
-  }, [activeTaskIndex, values]);
+  }, [sessionType, values]);
 
   // console.log(Dimensions.get("screen").width / 2);
   // console.log(circularProgressRef.current);
   // console.log("values", values);
   // console.log("animation duration", animationDuration);
-  console.log("current fill", currentFill);
+  // console.log("current fill", currentFill);
+  // console.log("sessionType", sessionType);
+  // console.log("activeTaskIndex", activeTaskIndex);
+  console.log("values", values);
+  // console.log("navigation", navigation);
 
   return (
     <ScrollView style={{ backgroundColor: "#343a40" }}>
@@ -253,7 +330,6 @@ const Home = () => {
             position: "relative",
           }}
         >
-          <Text>{timerSs}</Text>
           <AnimatedCircularProgress
             prefill={prefill}
             ref={circularProgressRef}
@@ -294,7 +370,7 @@ const Home = () => {
                 color: "#fff",
               }}
             >
-              Focus
+              {sessionType === "task" ? "Focus" : "Break"}
             </Text>
           </View>
         </View>
@@ -308,7 +384,10 @@ const Home = () => {
           }}
         >
           <Pressable
-            onPress={() => resetTimer()}
+            onPress={() => {
+              // setActiveTaskIndex(0);
+              resetTimer();
+            }}
             style={{
               borderWidth: 1,
               borderColor: "#0086f7",
@@ -336,11 +415,24 @@ const Home = () => {
             )}
           </Pressable>
           <Pressable
-            onPress={() =>
-              setActiveTaskIndex((prev) =>
-                prev === totalTasks - 1 ? 0 : prev + 1
-              )
-            }
+            onPress={() => {
+              if (
+                activeTaskIndex === tasks.length - 1 &&
+                sessionType === "task"
+              ) {
+                setSessionType("longbreak");
+              } else if (
+                sessionType === "task" &&
+                activeTaskIndex !== tasks.length - 1
+              ) {
+                setSessionType("shortbreak");
+              } else {
+                setSessionType("task");
+                setActiveTaskIndex((prev) =>
+                  prev === tasks.length - 1 ? 0 : prev + 1
+                );
+              }
+            }}
             style={{
               borderWidth: 1,
               borderColor: "#0086f7",
@@ -376,7 +468,7 @@ const Home = () => {
                 color: "#d3d3d3",
               }}
             >
-              {activeTaskIndex + 1} of {tasks.length * 2 + 1} sessions
+              #{activeTaskIndex + 1}
             </Text>
           </View>
         </View>
@@ -389,7 +481,7 @@ const Home = () => {
             }}
           >
             <Text style={{ fontSize: 16, color: "#f3f3f3" }}>Tasks</Text>
-            <Pressable>
+            <Pressable onPress={() => setShowAllTasksOptions(true)}>
               <MaterialIcons name="more-vert" size={24} color={"#f3f3f3"} />
             </Pressable>
           </View>
@@ -439,12 +531,13 @@ const Home = () => {
                         {task.title}
                       </Text>
                     </View>
-                    <Pressable>
-                      <MaterialIcons
-                        name="more-vert"
-                        size={24}
-                        color={"#f3f3f3"}
-                      />
+                    <Pressable
+                      onPress={() => {
+                        setShowEditTaskModal(task?.id);
+                        setTaskTitle(task?.title);
+                      }}
+                    >
+                      <FontAwesome5 name="edit" size={20} color={"#f3f3f3"} />
                     </Pressable>
                   </View>
                 ))
@@ -531,6 +624,116 @@ const Home = () => {
               onPress={() => handleAddTask()}
             >
               <Text style={{ color: "#fff" }}>Save</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+      <Modal isVisible={Boolean(showEditTaskModal)} animationIn={"fadeIn"}>
+        <View
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "#fff",
+          }}
+        >
+          <View
+            style={{
+              padding: 20,
+            }}
+          >
+            <TextInput
+              autoFocus
+              placeholder="What are you working on?"
+              value={taskTitle}
+              onChangeText={setTaskTitle}
+            />
+          </View>
+          <View
+            style={{
+              backgroundColor: "#d3d3d3",
+              padding: 15,
+              width: "100%",
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+            <Pressable
+              style={{
+                paddingVertical: 5,
+                paddingHorizontal: 15,
+                backgroundColor: "#d3d3d3",
+                borderWidth: 1,
+                borderColor: "#0086f7",
+                borderStyle: "solid",
+                borderRadius: 5,
+              }}
+              onPress={() => setShowEditTaskModal(null)}
+            >
+              <Text>Cancel</Text>
+            </Pressable>
+            <Pressable
+              style={{
+                paddingVertical: 5,
+                paddingHorizontal: 15,
+                backgroundColor: "#0086f7",
+                borderWidth: 1,
+                borderColor: "#0086f7",
+                borderStyle: "solid",
+                borderRadius: 5,
+              }}
+              onPress={() => handleUpdateTask()}
+            >
+              <Text style={{ color: "#fff" }}>Save</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+      <Modal isVisible={Boolean(showAllTasksOptions)} animationIn={"fadeIn"}>
+        <View
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            // alignItems: "center",
+            backgroundColor: "#fff",
+            // gap: 10,
+          }}
+        >
+          <View
+            style={{
+              padding: 20,
+              gap: 10,
+            }}
+          >
+            {/* <Pressable onPress={()=>handleClearFinishedTasks()}>
+              <Text style={{ fontSize: 16 }}>Clear finished tasks</Text>
+            </Pressable> */}
+            <Pressable onPress={() => handleClearAllTasks()}>
+              <Text style={{ fontSize: 16 }}>Clear all tasks</Text>
+            </Pressable>
+          </View>
+          <View
+            style={{
+              backgroundColor: "#d3d3d3",
+              padding: 15,
+              width: "100%",
+              flexDirection: "row",
+              justifyContent: "flex-end",
+            }}
+          >
+            <Pressable
+              style={{
+                paddingVertical: 5,
+                paddingHorizontal: 15,
+                backgroundColor: "#d3d3d3",
+                borderWidth: 1,
+                borderColor: "#0086f7",
+                borderStyle: "solid",
+                borderRadius: 5,
+              }}
+              onPress={() => setShowAllTasksOptions(false)}
+            >
+              <Text>Close</Text>
             </Pressable>
           </View>
         </View>
