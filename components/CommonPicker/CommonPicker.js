@@ -44,7 +44,7 @@ const CommonPicker = ({ items, value, handleChange }) => {
     );
   };
 
-  console.log(Platform);
+  // console.log(Platform);
 
   if (Platform.OS === "ios") {
     return (

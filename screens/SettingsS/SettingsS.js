@@ -81,7 +81,7 @@ const SettingsS = () => {
     } catch (e) {
       console.log(e);
     }
-    console.log(allKeys);
+    // console.log(allKeys);
   };
 
   const updateValues = async () => {
@@ -243,7 +243,7 @@ const SettingsS = () => {
             </Text>
           </View>
           <View style={{ gap: 10 }}>
-            <View
+            {/* <View
               style={{
                 gap: 10,
                 flexDirection: "row",
@@ -262,8 +262,8 @@ const SettingsS = () => {
               <Text style={{ fontSize: 16, color: "#f3f3f3" }}>
                 Timer in title
               </Text>
-            </View>
-            <View
+            </View> */}
+            {/* <View
               style={{
                 gap: 10,
                 flexDirection: "row",
@@ -282,7 +282,7 @@ const SettingsS = () => {
               <Text style={{ fontSize: 16, color: "#f3f3f3" }}>
                 Notifications
               </Text>
-            </View>
+            </View> */}
             <View
               style={{
                 gap: 10,
@@ -298,7 +298,7 @@ const SettingsS = () => {
               />
               <Text style={{ fontSize: 16, color: "#f3f3f3" }}>Autostart</Text>
             </View>
-            <View
+            {/* <View
               style={{
                 gap: 10,
                 flexDirection: "row",
@@ -312,7 +312,7 @@ const SettingsS = () => {
                 value={values?.darkmode}
               />
               <Text style={{ fontSize: 16, color: "#f3f3f3" }}>Dark mode</Text>
-            </View>
+            </View> */}
           </View>
           <View style={{ marginTop: "auto" }}>
             <Text

@@ -28,7 +28,6 @@ import { v4 as uuidv4 } from "uuid";
 import sounds from "../../utils/sounds";
 import { Audio } from "expo-av";
 import { useNavigation } from "@react-navigation/native";
-import sounds from "../../utils/sounds";
 
 const Home = () => {
   const circularProgressRef = useRef();
@@ -97,7 +96,7 @@ const Home = () => {
     }
   };
 
-  const resetTimer = () => {
+  const resetTimer = (resetAndstartAgain) => {
     if (circularProgressRef.current) {
       circularProgressRef.current.animate(0, 100, Easing.linear);
     }
@@ -105,6 +104,11 @@ const Home = () => {
     setTimerSs(Math.round(animationDuration / 1000));
     setTimerRunning(false);
     clearInterval(timerRef.current);
+    setTimeout(() => {
+      if (resetAndstartAgain) {
+        startTimer();
+      }
+    }, 500);
   };
 
   const getAsyncStoreSettingsData = async () => {
@@ -283,9 +287,23 @@ const Home = () => {
 
   useEffect(() => {
     if (timerSs === 0) {
-      resetTimer();
+      resetTimer(values?.autostart);
       handlePlaySound(values?.notificationSound);
-      setActiveTaskIndex((prev) => (prev !== tasks * 2 ? prev + 1 : 0));
+      if (values?.autostart) {
+        if (activeTaskIndex === tasks.length - 1 && sessionType === "task") {
+          setSessionType("longbreak");
+        } else if (
+          sessionType === "task" &&
+          activeTaskIndex !== tasks.length - 1
+        ) {
+          setSessionType("shortbreak");
+        } else {
+          setSessionType("task");
+          setActiveTaskIndex((prev) =>
+            prev === tasks.length - 1 ? 0 : prev + 1
+          );
+        }
+      }
     }
   }, [timerSs]);
 
@@ -309,6 +327,7 @@ const Home = () => {
   // console.log("values", values);
   // console.log("navigation", navigation);
   // console.log(timerSs);
+  // console.log(activeTaskIndex(0));
 
   return (
     <ScrollView style={{ backgroundColor: "#343a40" }}>
@@ -339,7 +358,6 @@ const Home = () => {
             size={Dimensions.get("screen").width * 0.65}
             width={25}
             fill={0}
-            // duration={60000}
             tintColor="#f381a6"
             onAnimationComplete={() => console.log("onAnimationComplete")}
             backgroundColor="#543ef6"
@@ -419,6 +437,7 @@ const Home = () => {
           </Pressable>
           <Pressable
             onPress={() => {
+              resetTimer();
               if (
                 activeTaskIndex === tasks.length - 1 &&
                 sessionType === "task"

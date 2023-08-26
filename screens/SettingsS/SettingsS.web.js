@@ -137,6 +137,8 @@ const SettingsS = () => {
           margin: "0 auto",
           display: "flex",
           flexDirection: "column",
+          justifyContent: "space-between",
+          height: "100%",
           gap: 20,
         }}
       >
@@ -147,118 +149,127 @@ const SettingsS = () => {
             gap: 20,
           }}
         >
-          <Text style={{ fontSize: 16, color: "#f3f3f3" }}>Task duration</Text>
-          <Slider
-            // style={{width: 200, height: 40}}
-            step={1}
-            // thumbImage={require("../../assets/favicon.png")}
-            value={values?.taskduration}
-            onValueChange={(value) => {
-              setValues({
-                ...values,
-                taskduration: value,
-              });
-            }}
-            minimumValue={5}
-            maximumValue={60}
-            minimumTrackTintColor="#FFFFFF"
-            maximumTrackTintColor="#fff"
-          />
-        </div>
-        <div
-          style={{
-            gap: 20,
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <Text style={{ fontSize: 16, color: "#f3f3f3" }}>
-            Short break duration
-          </Text>
-          <Slider
-            // style={{width: 200, height: 40}}
-            step={1}
-            value={values?.shortbreakduration}
-            onValueChange={(value) =>
-              setValues({
-                ...values,
-                shortbreakduration: value,
-              })
-            }
-            minimumValue={1}
-            maximumValue={30}
-            minimumTrackTintColor="#FFFFFF"
-            maximumTrackTintColor="#fff"
-          />
-        </div>
-        <div
-          style={{
-            gap: 20,
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <Text style={{ fontSize: 16, color: "#f3f3f3" }}>
-            Long break duration
-          </Text>
-          <Slider
-            step={1}
-            // style={{width: 200, height: 40}}
-            value={values?.longbreakduration}
-            onValueChange={(value) =>
-              setValues({
-                ...values,
-                longbreakduration: value,
-              })
-            }
-            minimumValue={1}
-            maximumValue={45}
-            minimumTrackTintColor="#FFFFFF"
-            maximumTrackTintColor="#fff"
-          />
-        </div>
-        <div
-          style={{
-            borderColor: "#d3d3d3",
-            borderWidth: 1,
-            borderStyle: "solid",
-            borderRadius: 5,
-            marginTop: 20,
-            position: "relative",
-          }}
-        >
-          <CommonPicker
-            items={sounds.map((sound) => {
-              return {
-                label: sound?.label,
-                value: sound?.label,
-              };
-            })}
-            value={values?.notificationSound}
-            handleChange={(itemValue) => {
-              setValues({
-                ...values,
-                notificationSound: itemValue,
-              });
-              handlePlaySound(itemValue);
-            }}
-          />
-          <Text
+          <div
             style={{
-              fontSize: 15,
-              position: "absolute",
-              top: -16,
-              left: 6,
-              backgroundColor: "#343a40",
-              padding: 5,
-              color: "#f1f1f1",
+              display: "flex",
+              flexDirection: "column",
+              gap: 20,
             }}
           >
-            Notification Sound
-          </Text>
-        </div>
-        <div style={{ gap: 20, display: "flex", flexDirection: "column" }}>
+            <Text style={{ fontSize: 16, color: "#f3f3f3" }}>
+              Task duration
+            </Text>
+            <Slider
+              // style={{width: 200, height: 40}}
+              step={1}
+              // thumbImage={require("../../assets/favicon.png")}
+              value={values?.taskduration}
+              onValueChange={(value) => {
+                setValues({
+                  ...values,
+                  taskduration: value,
+                });
+              }}
+              minimumValue={5}
+              maximumValue={60}
+              minimumTrackTintColor="#FFFFFF"
+              maximumTrackTintColor="#fff"
+            />
+          </div>
           <div
+            style={{
+              gap: 20,
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Text style={{ fontSize: 16, color: "#f3f3f3" }}>
+              Short break duration
+            </Text>
+            <Slider
+              // style={{width: 200, height: 40}}
+              step={1}
+              value={values?.shortbreakduration}
+              onValueChange={(value) =>
+                setValues({
+                  ...values,
+                  shortbreakduration: value,
+                })
+              }
+              minimumValue={1}
+              maximumValue={30}
+              minimumTrackTintColor="#FFFFFF"
+              maximumTrackTintColor="#fff"
+            />
+          </div>
+          <div
+            style={{
+              gap: 20,
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Text style={{ fontSize: 16, color: "#f3f3f3" }}>
+              Long break duration
+            </Text>
+            <Slider
+              step={1}
+              // style={{width: 200, height: 40}}
+              value={values?.longbreakduration}
+              onValueChange={(value) =>
+                setValues({
+                  ...values,
+                  longbreakduration: value,
+                })
+              }
+              minimumValue={1}
+              maximumValue={45}
+              minimumTrackTintColor="#FFFFFF"
+              maximumTrackTintColor="#fff"
+            />
+          </div>
+          <div
+            style={{
+              borderColor: "#d3d3d3",
+              borderWidth: 1,
+              borderStyle: "solid",
+              borderRadius: 5,
+              marginTop: 20,
+              position: "relative",
+            }}
+          >
+            <CommonPicker
+              items={sounds.map((sound) => {
+                return {
+                  label: sound?.label,
+                  value: sound?.label,
+                };
+              })}
+              value={values?.notificationSound}
+              handleChange={(itemValue) => {
+                setValues({
+                  ...values,
+                  notificationSound: itemValue,
+                });
+                handlePlaySound(itemValue);
+              }}
+            />
+            <Text
+              style={{
+                fontSize: 15,
+                position: "absolute",
+                top: -16,
+                left: 6,
+                backgroundColor: "#343a40",
+                padding: 5,
+                color: "#f1f1f1",
+              }}
+            >
+              Notification Sound
+            </Text>
+          </div>
+          <div style={{ gap: 20, display: "flex", flexDirection: "column" }}>
+            {/* <div
             style={{
               gap: 10,
               display: "flex",
@@ -278,8 +289,8 @@ const SettingsS = () => {
             <Text style={{ fontSize: 16, color: "#f3f3f3" }}>
               Timer in title
             </Text>
-          </div>
-          <div
+          </div> */}
+            {/* <div
             style={{
               gap: 10,
               display: "flex",
@@ -299,24 +310,24 @@ const SettingsS = () => {
             <Text style={{ fontSize: 16, color: "#f3f3f3" }}>
               Notifications
             </Text>
-          </div>
-          <div
-            style={{
-              gap: 10,
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <Switch
-              onValueChange={() =>
-                setValues({ ...values, autostart: !values?.autostart })
-              }
-              value={values?.autostart}
-            />
-            <Text style={{ fontSize: 16, color: "#f3f3f3" }}>Autostart</Text>
-          </div>
-          <div
+          </div> */}
+            <div
+              style={{
+                gap: 10,
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <Switch
+                onValueChange={() =>
+                  setValues({ ...values, autostart: !values?.autostart })
+                }
+                value={values?.autostart}
+              />
+              <Text style={{ fontSize: 16, color: "#f3f3f3" }}>Autostart</Text>
+            </div>
+            {/* <div
             style={{
               gap: 10,
               display: "flex",
@@ -331,14 +342,18 @@ const SettingsS = () => {
               value={values?.darkmode}
             />
             <Text style={{ fontSize: 16, color: "#f3f3f3" }}>Dark mode</Text>
+          </div> */}
           </div>
         </div>
-        <div style={{ marginTop: "auto" }}>
+        <div
+          style={{
+            textAlign: "center",
+          }}
+        >
           <Text
             style={{
               fontSize: 16,
               color: "#c3c3c3",
-              textAlign: "center",
             }}
           >
             v{packageJSON.version}
