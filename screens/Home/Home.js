@@ -28,6 +28,7 @@ import { v4 as uuidv4 } from "uuid";
 import sounds from "../../utils/sounds";
 import { Audio } from "expo-av";
 import { useNavigation } from "@react-navigation/native";
+import sounds from "../../utils/sounds";
 
 const Home = () => {
   const circularProgressRef = useRef();
@@ -66,6 +67,7 @@ const Home = () => {
   const [showAllTasksOptions, setShowAllTasksOptions] = useState(false);
 
   const handlePlaySound = async (soundName) => {
+    console.log("coming here home ");
     const { sound } = await Audio.Sound.createAsync(
       sounds?.find((sound) => sound.label === soundName)?.path
     );
@@ -141,7 +143,7 @@ const Home = () => {
     } catch (e) {
       console.log(e);
     }
-    console.log(allKeys);
+    // console.log(allKeys);
   };
 
   const getAsyncStoreData = async () => {
@@ -158,7 +160,7 @@ const Home = () => {
     } catch (e) {
       console.log(e);
     }
-    console.log(allKeys);
+    // console.log(allKeys);
   };
 
   const handleAddTask = async () => {
@@ -304,8 +306,9 @@ const Home = () => {
   // console.log("current fill", currentFill);
   // console.log("sessionType", sessionType);
   // console.log("activeTaskIndex", activeTaskIndex);
-  console.log("values", values);
+  // console.log("values", values);
   // console.log("navigation", navigation);
+  // console.log(timerSs);
 
   return (
     <ScrollView style={{ backgroundColor: "#343a40" }}>

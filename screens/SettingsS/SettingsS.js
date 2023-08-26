@@ -24,15 +24,25 @@ import { Picker } from "@react-native-picker/picker";
 import sounds from "../../utils/sounds";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
+import CommonPicker from "../../components/CommonPicker/CommonPicker";
 
 const SettingsS = () => {
   const [values, setValues] = useState({});
 
   const handlePlaySound = async (soundName) => {
-    const { sound } = await Audio.Sound.createAsync(
-      sounds?.find((sound) => sound.label === soundName)?.path
-    );
-    await sound.playAsync();
+    console.log("coming here settings ");
+    try {
+      const { sound } = await Audio.Sound.createAsync(
+        sounds?.find((sound) => sound.label === soundName)?.path
+      );
+      try {
+        await sound.playAsync();
+      } catch (e) {
+        console.log(e);
+      }
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const getAsyncStoreSettingsData = async () => {
@@ -82,7 +92,7 @@ const SettingsS = () => {
       } else {
         await AsyncStorage.setItem("settings", JSON.stringify(values));
       }
-      console.log("settings", settings);
+      // console.log("settings", settings);
     } catch (e) {
       console.log(e);
     }
@@ -102,7 +112,7 @@ const SettingsS = () => {
     getAsyncStoreSettingsData();
   }, []);
 
-  console.log("values", values);
+  // console.log("values", values);
 
   return (
     <View>
@@ -202,36 +212,22 @@ const SettingsS = () => {
               marginTop: 20,
             }}
           >
-            <Picker
-              mode="modal"
-              selectedValue={values?.notificationSound}
-              onValueChange={(itemValue, itemIndex) => {
+            <CommonPicker
+              items={sounds.map((sound) => {
+                return {
+                  label: sound?.label,
+                  value: sound?.label,
+                };
+              })}
+              value={values?.notificationSound}
+              handleChange={(itemValue) => {
                 setValues({
                   ...values,
                   notificationSound: itemValue,
                 });
                 handlePlaySound(itemValue);
               }}
-              style={{
-                color: "#f3f3f3",
-              }}
-              dropdownIconColor={"#d3d3d3"}
-              itemStyle={{
-                color: "#d3d3d3",
-                borderColor: "#d3d3d3",
-                borderWidth: 1,
-                borderStyle: "solid",
-                // backgroundColor: "#343a40",
-              }}
-            >
-              {sounds.map((sound) => (
-                <Picker.Item
-                  key={sound?.label}
-                  label={sound?.label}
-                  value={sound?.label}
-                />
-              ))}
-            </Picker>
+            />
             <Text
               style={{
                 fontSize: 15,
@@ -246,7 +242,7 @@ const SettingsS = () => {
               Notification Sound
             </Text>
           </View>
-          <View>
+          <View style={{ gap: 10 }}>
             <View
               style={{
                 gap: 10,
