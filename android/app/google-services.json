@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "830126851162",
+    "project_id": "pomofocar",
+    "storage_bucket": "pomofocar.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:830126851162:android:294923100a13e0188e0463",
+        "android_client_info": {
+          "package_name": "com.pomofocar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "830126851162-v51j0tjn3frkec1apib6nejc20hgrq9d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6cJjJDVDgo2N8SMq0PX4p76KI5NjNvEk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "830126851162-v51j0tjn3frkec1apib6nejc20hgrq9d.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "830126851162-87kagt5vqkemfc96l0jg3hlspd2s0beq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.pomofocar"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
